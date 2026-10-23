@@ -1,8 +1,31 @@
-# SearXNG Forge
+<p align="center">
+  <img src="assets/hero.png" alt="SearXNG Forge" width="720">
+</p>
 
-> 用你自己的资源，host 出你能拥有的最高质量的搜索。
+<h1 align="center">SearXNG Forge</h1>
+
+<p align="center">用你自己的资源，host 出你能拥有的最高质量的搜索。</p>
+
+<p align="center"><b><a href="README.md">简体中文</a> · <a href="README.en.md">English</a></b></p>
 
 一个 agent skill：在你的服务器 / 本机 Docker 上把 [SearXNG](https://github.com/searxng/searxng) 从"装完全是 CAPTCHA"调到"这台机器网络条件下的最优"——网络地基、引擎自校准、权重排序、接入你的 AI agent，一条流程走完。
+
+## 零门槛开始（不会终端也没关系）
+
+如果你的电脑上有 zcode、Claude Code 这类 AI 编程助手，直接把下面这段话复制粘贴给它，剩下的交给它：
+
+```text
+请帮我部署并调优 SearXNG 自托管搜索引擎。先执行这个安装命令：
+curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
+装好后按 searxng-forge 这个 skill 的流程走：先探测环境再问我必要的问题，
+系统级操作逐一征求我同意，最后把搜索接入你自己的工具链。
+```
+
+熟悉终端的话，也可以自己装好后对 AI 助手说"用 searxng-forge 部署调优 SearXNG"：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
+```
 
 ## 为什么你需要它
 
@@ -12,30 +35,27 @@
 - 如果你在墙内，DNS 解析本身就被污染——引擎连"正确的服务器"都摸不到
 - 你的请求指纹像爬虫，引擎会"放毒"：返回结构正常但内容无关的垃圾结果
 
-这些问题不解决，怎么调引擎清单都是隔靴搔痒。**SearXNG Forge 把地基和调优做成了一条有先后依赖的流水线。**
+这些问题不解决，怎么调引擎清单都是隔靴搔痒。**SearXNG Forge 把地基和调优做成了有先后依赖的流水线：**
 
-## 它做什么
-
-```
-① 探测与问答      自动探测出口 IP/墙内与否/DNS 污染/资源/Docker，只问 4 个探测不到的决策题
-② 网络地基        按你的资源分流：装 mihomo + fake-ip DNS + 透明代理 / 本地代理 / 海外裸连 / 诚实的降级
-③ 安装            Docker 没有就（经你授权）装；容器参数、基础配置一次到位
-④ 实测调优        低频单引擎自校准，生成这台机器自己的引擎清单 + 排序权重，而非照抄会过时的清单
-⑤ 验证固化        中英文综合验证 + /stats 健康检查 + 生成这台机器的搜索档案
-⑥ 接入 agent      把搜索接成你 agent 的 MCP / skill，交接使用红线
+```mermaid
+flowchart LR
+    A[① 探测与问答<br/>出口IP/墙内/DNS污染/资源<br/>只问4个决策题] --> B[② 网络地基<br/>mihomo+fake-ip DNS<br/>或本地代理/裸连分支]
+    B --> C[③ 安装<br/>Docker缺就授权装<br/>容器与基础配置]
+    C --> D[④ 实测调优<br/>低频单引擎自校准<br/>生成引擎清单+权重]
+    D --> E[⑤ 验证固化<br/>质量基线+/stats<br/>生成机器档案]
+    E --> F[⑥ 接入agent<br/>MCP/skill<br/>交接使用红线]
 ```
 
-## 一句话安装
+## 调优后是什么水平
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
-```
+内置 `benchmark.sh` 质量基线（8 个中英文真实查询 + 权威域名命中，success@5 口径），调优前后跑分对比、长期回归都有数字可依。实机战绩（2GB 内存的 Armbian 小盒子，墙内 + 自建新加坡节点出口）：
 
-然后在 zcode（或兼容 skill 体系的 agent）里说：
-
-> 帮我用 searxng-forge 在这台机器上部署并调优 SearXNG
-
-也可以 `git clone` 后 `./install.sh` 本地安装。
+| 指标 | 调优前 | 调优后 |
+|---|---|---|
+| 可用引擎 | 1 个（bing 独苗） | 16+ 个（中英文全梯队） |
+| 中文综合查询 | CAPTCHA / 零星结果 | 35 条结果、零失效引擎 |
+| success@5 质量基线 | — | **75%**（健康线以上） |
+| github / npm / ddg news / google cse | 全部超时 | 全部复活 |
 
 ## 为什么它能用三年
 
@@ -51,15 +71,6 @@ curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install
 - **墙内裸连（无任何代理资源）**：海外引擎基本不可用，skill 会把现实摆清楚让你决定，而不是假装能修。
 - 带宽与 IP 需要你自己有（机场订阅、自建节点、或海外 VPS 均可，skill 会分支处理）。
 
-## 一次实机调优的战绩（方法论出处）
-
-在一台 2GB 内存的 Armbian 小盒子上（墙内 + 自建新加坡节点出口），这套流程把"只有 bing 能出结果"调到：
-
-- DNS 污染根除（mihomo fake-ip 接管容器解析），github / npm / duckduckgo news / google cse 从超时全部复活
-- Wikipedia 从 429 到正常（一个带联系方式的 UA 后缀——Wikimedia 的机房 IP 政策）
-- 引擎集体风控从"一次广撒网查询就团灭"到中英文综合查询 35 条结果、零失效引擎
-- 全程不假设用户懂 Docker，系统级操作逐一授权
-
 ## FAQ
 
 **Q: 它会动我的系统吗？** 安装 Docker / mihomo / 修改 iptables 这类系统级操作，每一步都会先说明影响并征求你的同意，只读探测不需要授权。
@@ -67,6 +78,8 @@ curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install
 **Q: 和直接用 ddg/google 有什么区别？** 隐私（查询分散在多个引擎、无广告跟踪）、可控（自己的档案文档、agent 直连 JSON API）、以及中文环境下不受单一引擎摆布。
 
 **Q: 支持哪些 agent 接入？** skill 体系和 MCP 体系都支持。searxng 的 JSON API 本身就是免鉴权 HTTP，接入是把说明书交给你常用的 agent，配置现场生成。
+
+**Q: 质量基线怎么复跑？** `bash scripts/benchmark.sh http://127.0.0.1:8080`，建议出口变更或大版本升级后重跑一次。
 
 ## License
 

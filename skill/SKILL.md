@@ -210,9 +210,10 @@ bash scripts/enginetest.sh http://127.0.0.1:8080 zh   # 中文轮
 ## 阶段四：验证与固化
 
 1. zh/en 各一条**综合查询**（带 `engines=` 指定 3-5 个引擎）：结果 ≥15 条、首条相关、`unresponsive_engines` 为空或只有已知禁用项。
-2. `curl http://127.0.0.1:8080/stats/errors` 全绿或错误率个位数。
-3. 在 `/opt/searxng/`（或对应卷目录）生成这台机器的档案文档：可用引擎清单（含实测日期）、推荐 engines 组合（中/英/学术/开发/新闻分场景）、已知风险引擎、`/stats` 观测方法。模板参考 `scripts/profiles-template.md`。
-4. 若公网暴露：`limiter: true`、配置反向代理 + botdetection（limiter.toml）、base_url 改公网地址。局域网/本机使用保持现状。
+2. **质量基线**：`bash scripts/benchmark.sh <base_url>`——8 个中英文真实查询的黄金域名命中评测（success@5）。≥75% 健康；50-75% 看 dead 标注哪个引擎拖后腿；<50% 回头检查网络地基。跑完把分数记进档案文档，作为这台机器的基线（出口变更/大升级后重跑对比）。注意黄金域名集有主观性（如中文技术内容 CSDN 是否算命中），MISS 时先看 top-5 实际域名再下结论。
+3. `curl http://127.0.0.1:8080/stats/errors` 全绿或错误率个位数。
+4. 在 `/opt/searxng/`（或对应卷目录）生成这台机器的档案文档：可用引擎清单（含实测日期）、推荐 engines 组合（中/英/学术/开发/新闻分场景）、已知风险引擎、`/stats` 观测方法、质量基线分数。模板参考 `scripts/profiles-template.md`。
+5. 若公网暴露：`limiter: true`、配置反向代理 + botdetection（limiter.toml）、base_url 改公网地址。局域网/本机使用保持现状。
 
 ## 阶段五：接入 agent（MCP / skill）
 
