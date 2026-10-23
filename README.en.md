@@ -16,7 +16,7 @@ If you use an AI coding assistant such as zcode or Claude Code, paste the prompt
 
 ```text
 Please deploy and tune a self-hosted SearXNG search engine for me. First run this installer:
-curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Clickist/searxng-forge/main/install.sh | bash
 Then follow the searxng-forge skill: probe the environment before asking me anything,
 get my approval for every system-level change, and wire search into your own toolchain at the end.
 ```
@@ -24,7 +24,7 @@ get my approval for every system-level change, and wire search into your own too
 For terminal users, run the installer directly, then prompt your assistant to "deploy and tune SearXNG with searxng-forge":
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Clickist/searxng-forge/main/install.sh | bash
 ```
 
 ## Why you need it

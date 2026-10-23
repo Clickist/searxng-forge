@@ -16,7 +16,7 @@
 
 ```text
 请帮我部署并调优 SearXNG 自托管搜索引擎。先执行这个安装命令：
-curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Clickist/searxng-forge/main/install.sh | bash
 装好后按 searxng-forge 这个 skill 的流程走：先探测环境再问我必要的问题，
 系统级操作逐一征求我同意，最后把搜索接入你自己的工具链。
 ```
@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install
 熟悉终端操作的用户，也可以手动安装后提示助手“用 searxng-forge 部署调优 SearXNG”：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Clickist/searxng-forge/main/install.sh | bash
 ```
 
 ## 为什么需要它

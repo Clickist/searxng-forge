@@ -4,7 +4,7 @@
 # 本地: ./install.sh
 set -eu
 
-REPO="${SEARXNG_FORGE_REPO:-https://github.com/clickist/searxng-forge}"
+REPO="${SEARXNG_FORGE_REPO:-https://github.com/Clickist/searxng-forge}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
