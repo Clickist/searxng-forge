@@ -4,15 +4,15 @@
 
 <h1 align="center">SearXNG Forge</h1>
 
-<p align="center">Host the highest-quality search your own resources can deliver.</p>
+<p align="center">Host the highest-quality search your own infrastructure can deliver.</p>
 
 <p align="center"><b><a href="README.md">简体中文</a> · <a href="README.en.md">English</a></b></p>
 
-An agent skill that takes a self-hosted [SearXNG](https://github.com/searxng/searxng) from "everything is CAPTCHAs" to "the best your machine's network can possibly be" — network foundation, per-machine engine self-calibration, ranking weights, and wiring it into your AI agent, in one pipeline.
+An agent skill designed to take self-hosted [SearXNG](https://github.com/searxng/searxng) from broken, CAPTCHA-ridden defaults to the highest operational standard your network allows — covering network prerequisites, dynamic engine calibration, rank weighting, and agent integration in a unified workflow.
 
-## Zero-threshold start (no terminal knowledge required)
+## Quick start (no terminal experience required)
 
-If you have an AI coding assistant like zcode or Claude Code, just paste this to it and let it drive:
+If you use an AI coding assistant such as zcode or Claude Code, paste the prompt below into your assistant and let it handle execution:
 
 ```text
 Please deploy and tune a self-hosted SearXNG search engine for me. First run this installer:
@@ -21,7 +21,7 @@ Then follow the searxng-forge skill: probe the environment before asking me anyt
 get my approval for every system-level change, and wire search into your own toolchain at the end.
 ```
 
-Terminal-savvy? Install it yourself, then tell your assistant "deploy and tune SearXNG with searxng-forge":
+For terminal users, run the installer directly, then prompt your assistant to "deploy and tune SearXNG with searxng-forge":
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install.sh | bash
@@ -29,13 +29,13 @@ curl -fsSL https://raw.githubusercontent.com/clickist/searxng-forge/main/install
 
 ## Why you need it
 
-The default self-hosted SearXNG experience: DuckDuckGo wants a CAPTCHA, Google returns nothing, Wikipedia 403s. Tutorials say "try another engine" — but the real causes are almost never in SearXNG's config:
+Default deployments of SearXNG frequently disappoint: DuckDuckGo triggers CAPTCHAs, Google yields empty responses, and Wikipedia returns HTTP 403. Most tutorials advise toggling alternative engines, but configuration tweaks rarely resolve the underlying failures:
 
-- Your egress IP is a datacenter IP; search engines trust it far less than a residential one
-- Behind the GFW, your DNS answers are poisoned — engines never even get reached at the right server
-- Your request fingerprint looks like a bot, so engines serve "poisoned" SERPs: structurally valid results with irrelevant content
+- **Egress IP reputation**: Search engines enforce strict rate limits and challenges on datacenter (ASN) ranges compared to residential connections.
+- **DNS poisoning**: In restrictive network environments, poisoned DNS queries prevent requests from reaching authentic origin servers.
+- **Bot fingerprinting**: Naked client signatures trigger defensive responses from upstream providers, often resulting in syntactically valid but completely irrelevant SERPs.
 
-Until these are fixed, tuning engine lists is scratching an itch through a boot. **SearXNG Forge turns foundation and tuning into an ordered pipeline:**
+Altering engine lists without resolving infrastructure constraints merely treats symptoms. **SearXNG Forge structures environment remediation and engine tuning into an ordered pipeline:**
 
 ```mermaid
 flowchart LR
@@ -46,9 +46,11 @@ flowchart LR
     E --> F[⑥ Agent wiring<br/>MCP / skill<br/>usage guardrails]
 ```
 
-## What level does tuning reach
+## Benchmarks and real-world results
 
-A built-in `benchmark.sh` quality baseline (8 real zh/en queries with gold-domain hits, success@5) gives you numbers before/after tuning and for long-term regression. Real-machine results (a 2 GB Armbian box, behind the GFW, egress via a self-hosted Singapore node):
+SearXNG Forge includes a `benchmark.sh` test suite measuring 8 real-world bilingual queries against authoritative domain hits using the success@5 metric. This provides quantifiable comparisons both during initial tuning and for subsequent regression checks.
+
+Representative results from a constrained environment (2 GB RAM Armbian device, behind the GFW, routed via a self-hosted Singapore egress node):
 
 | Metric | Before | After |
 |---|---|---|
@@ -57,29 +59,35 @@ A built-in `benchmark.sh` quality baseline (8 real zh/en queries with gold-domai
 | success@5 baseline | — | **75%** (above healthy line) |
 | github / npm / ddg news / google cse | all timeouts | all revived |
 
-## Why it stays useful for years
+## Why it stays reliable for years
 
-Every tutorial's weak spot: engine ecosystems and anti-bot measures change monthly, so hardcoded configs rot in weeks. This skill inverts the design:
+Most guides fail because search engine defenses and upstream interfaces evolve constantly; hardcoded configuration templates decay within weeks. This skill is engineered around principles rather than static states:
 
-- **Distills methods, not snapshots.** Built-in engine findings are date-stamped snapshots that must be re-tested at run time; config templates are only starting points, and every machine generates its own list via self-calibration.
-- **Scripts collect evidence; judgment lives in the process.** Poisoned-IP signatures and engine rosters change; the method of comparing and deciding does not.
-- **Upgrading the image beats tweaking config.** Upstream keeps fixing engine workarounds (the 2026 DDG block was officially solved by shipping curl_cffi browser impersonation in the image) — that principle is baked into the SOP.
+- **Codify methodology, not static snapshots.** Packaged engine recommendations include explicit timestamp metadata and must be re-validated at runtime. Configuration templates serve only as baselines; each host calibrates its own active engine set.
+- **Isolate evidence collection from evaluation logic.** While poisoned IP subnets and engine rosters shift, the evaluation model—comparing query outcomes against deterministic ground truth—remains consistent.
+- **Prioritize upstream image updates over local patches.** The SearXNG core project actively tracks upstream breaking changes (such as adopting curl_cffi for browser impersonation to address DuckDuckGo challenges). Following upstream fixes is formalized in the skill's standard operating procedure.
 
 ## Honest limits
 
-- **Egress IP reputation is a resource problem, not a config problem.** On datacenter IPs the main Google engine is effectively dead (disabled upstream), and Bing fluctuates. What this skill does: max out the datacenter-friendly lineup (DDG / Brave / Wikipedia / GitHub / arXiv) and tell you plainly which engines just won't work on your box.
-- **Behind the GFW with zero proxy resources**: overseas engines are mostly unreachable; the skill lays out reality and lets you decide instead of pretending.
-- Bandwidth and IP are yours to bring (airport subscription, self-hosted node, or an overseas VPS — the skill branches accordingly).
+- **Egress reputation is an infrastructure reality, not a software configuration.** Mainline Google search is largely inaccessible from standard datacenter IPs (and disabled by default upstream), while Bing access remains variable. The skill focuses on maximizing datacenter-tolerant engines (such as DuckDuckGo, Brave, Wikipedia, GitHub, and arXiv) while explicitly identifying engines that cannot function reliably on the host.
+- **Direct connections without proxy routing in restricted regions**: Overseas providers will remain predominantly inaccessible. The workflow surfaces these constraints transparently for informed decisions rather than attempting futile workarounds.
+- **Prerequisite resources**: Network egress and bandwidth remain the user's responsibility (commercial proxies, self-hosted relays, or international VPS instances; the skill adapts its deployment path accordingly).
 
 ## FAQ
 
-**Q: Will it touch my system?** System-level actions (installing Docker / mihomo, editing iptables) each get explained and approved first. Read-only probing needs no approval.
+**Q: Does it modify host system configurations?**
+Any privileged operation—such as installing Docker, configuring mihomo, or updating iptables—requires explicit explanation and user authorization prior to execution. Initial environment discovery is strictly read-only.
 
-**Q: How is this different from just using ddg/google?** Privacy (queries spread across engines, no ad tracking), control (your own profile doc, agents hit the JSON API directly), and not being at the mercy of any single engine.
+**Q: Why self-host instead of querying Google or DuckDuckGo directly?**
+- **Privacy**: Search requests are fragmented across multiple upstreams without centralized tracking or targeted ads.
+- **Autonomy**: You maintain full ownership of system profiles and expose an unauthenticated local JSON API optimized for AI agent consumption.
+- **Resilience**: Aggregating diverse sources mitigates regional network degradations and algorithmic changes from any single commercial provider.
 
-**Q: Which agents can it wire into?** Both skill-based and MCP-based agents. SearXNG's JSON API is auth-free HTTP; wiring means handing your agent a manual, with config generated at run time.
+**Q: Which AI agent architectures are supported?**
+The skill integrates with both native agent skill systems and Model Context Protocol (MCP) clients. Because SearXNG exposes an unauthenticated HTTP JSON API, integration involves generating targeted configuration snippets and operating instructions for your agent environment at runtime.
 
-**Q: How do I re-run the baseline?** `bash scripts/benchmark.sh http://127.0.0.1:8080` — recommended after egress changes or major upgrades.
+**Q: How can I re-run the quality baseline?**
+Execute `bash scripts/benchmark.sh http://127.0.0.1:8080`. Running the benchmark is recommended following network egress adjustments or major image version upgrades.
 
 ## License
 
